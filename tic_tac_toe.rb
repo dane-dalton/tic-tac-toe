@@ -7,30 +7,23 @@
   # XXX Welcome message
   # XXX Random selection for who goes first
 
-#Display board with numbered slots
+# XXX Display board with numbered slots
 
-  #Check if there is an open space
-    #Play unless there are no spaces open
-      #Prompt a draw, ask if they would like to play a new game
+  # XXX Check if there is an open space
+    # XXX Play unless there are no spaces open
+      # XXX Prompt a draw, ask if they would like to play a new game
 
-  #Ask which row they would like to pick, then column
+  # XXX Ask which slot they would like to pick
 
-  #See if the spot is filled
-    #Prompt for another selection if the spot is filled
+  # XXX See if the spot is filled
+    # XXX Prompt for another selection if the spot is filled
 
-  #Fill the spot
+  # XXX Fill the spot
 
   #Check if the game is over
     #If done, prompt the winner
       #Ask to play again
     #else, switch turns
-
-module GamePrompts
-  def player_choice(player)
-    puts "It is #{player}'s turn. Please pick a spot to play."
-    gets.chomp.to_i 
-  end
-end
 
 module Board
   def current_board(items)
@@ -41,7 +34,6 @@ module Board
 end
 
 class NewGame
-  include GamePrompts
   include Board
 
   @@PLAYERS = ["Player 1", "Player 2"]
@@ -58,7 +50,7 @@ class NewGame
   def get_player_position
     puts "It is #{self.current_player}'s turn. Please pick a spot to play:"
     input = gets.chomp.to_i
-    while (input <= 0 || input > 9) do #Input validation
+    while (input <= 0 || input > 9 || slot_full?(input)) do #Input validation
       puts "Please pick a valid tile to play:"
       input = gets.chomp.to_i
     end
@@ -73,10 +65,47 @@ class NewGame
     current_board(@board_slots)
   end
 
+  def board_full?
+    @board_slots.all? { |slot| slot == "X" || slot == "O" }
+  end
+
+  def check_winner?
+    @board_slots.each_with_index do |slot, i|
+      #Check column win
+      if (i >= 0 && i < 3)
+        if (@board_slots[i + 3] == slot && @board_slots[i + 6] == slot)
+          return true
+        end
+      end
+      #Check row win
+      if (i == 0 || i == 3 || i == 6)
+        if(@board_slots[i + 1] == slot && @board_slots[i + 2] == slot)
+          return true
+        end
+      end
+      #Check diagonal wins
+      if i == 0
+        if (@board_slots[4] == slot && @board_slots[8] == slot)
+          return true
+        end
+      end
+      if i == 6
+        if(@board_slots[4] == slot && @board_slots[2] == slot)
+          return true
+        end
+      end
+      return false
+    end
+  end
+
   private
     def insert_tile(player, i)
       @board_slots[i - 1] = "X" if player == @@PLAYERS[0]
       @board_slots[i - 1] = "O" if player == @@PLAYERS[1]
+    end
+
+    def slot_full?(i)
+      @board_slots[i - 1] == "X" || @board_slots[i - 1] == "O"
     end
 end
 
@@ -86,7 +115,17 @@ game = NewGame.new()
 while (game.game_continues) do
   game.display_board
   game.get_player_position
-  game.display_board
+  if game.check_winner?
+    puts game.check_winner?
+    puts "#{game.current_player} is the winner! Restart to play again."
+    game.game_continues = false
+    break
+  end
 
-  game.game_continues = false
+  game.swap_player
+  
+  if game.board_full?
+    puts "It's a draw! Restart to play again."
+    game.game_continues = false
+  end
 end
