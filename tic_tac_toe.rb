@@ -1,30 +1,3 @@
-#Board
-# _1_|_2_|_3_
-# _4_|_5_|_6_
-#  X | 8 | 9
-
-# XXX Initial UI
-  # XXX Welcome message
-  # XXX Random selection for who goes first
-
-# XXX Display board with numbered slots
-
-  # XXX Check if there is an open space
-    # XXX Play unless there are no spaces open
-      # XXX Prompt a draw, ask if they would like to play a new game
-
-  # XXX Ask which slot they would like to pick
-
-  # XXX See if the spot is filled
-    # XXX Prompt for another selection if the spot is filled
-
-  # XXX Fill the spot
-
-  #Check if the game is over
-    #If done, prompt the winner
-      #Ask to play again
-    #else, switch turns
-
 module Board
   def current_board(items)
     puts "_#{items[0]}_|_#{items[1]}_|_#{items[2]}_"
@@ -94,8 +67,8 @@ class NewGame
           return true
         end
       end
-      return false
     end
+    return false
   end
 
   private
@@ -116,7 +89,7 @@ while (game.game_continues) do
   game.display_board
   game.get_player_position
   if game.check_winner?
-    puts game.check_winner?
+    game.display_board
     puts "#{game.current_player} is the winner! Restart to play again."
     game.game_continues = false
     break
@@ -125,6 +98,7 @@ while (game.game_continues) do
   game.swap_player
   
   if game.board_full?
+    game.display_board
     puts "It's a draw! Restart to play again."
     game.game_continues = false
   end
