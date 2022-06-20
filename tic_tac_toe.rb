@@ -3,11 +3,11 @@
 # _4_|_5_|_6_
 #  X | 8 | 9
 
-#Initial UI
-  #Welcome message
-  #Random selection for who goes first
+# XXX Initial UI
+  # XXX Welcome message
+  # XXX Random selection for who goes first
 
-#Display board with numbered rows and columns
+#Display board with numbered slots
 
   #Check if there is an open space
     #Play unless there are no spaces open
@@ -34,9 +34,9 @@ end
 
 module Board
   def current_board(items)
-    puts "_#{item[0]}_|_#{item[1]}_|_#{item[2]}_"
-    puts "_#{item[3]}_|_#{item[4]}_|_#{item[5]}_"
-    puts " #{item[6]} | #{item[7]} | #{item[8]} "
+    puts "_#{items[0]}_|_#{items[1]}_|_#{items[2]}_"
+    puts "_#{items[3]}_|_#{items[4]}_|_#{items[5]}_"
+    puts " #{items[6]} | #{items[7]} | #{items[8]} "
   end
 end
 
@@ -47,23 +47,46 @@ class NewGame
   @@PLAYERS = ["Player 1", "Player 2"]
 
   attr_reader :current_player
+  attr_accessor :game_continues
 
   def initialize()
     @current_player = ((rand(2) == 0)? @@PLAYERS[0]: @@PLAYERS[1])
     @board_slots = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    @game_continues = true
   end
 
-  def prompt_current_player
+  def get_player_position
     puts "It is #{self.current_player}'s turn. Please pick a spot to play:"
-    gets.chomp.to_i
+    input = gets.chomp.to_i
+    while (input <= 0 || input > 9) do #Input validation
+      puts "Please pick a valid tile to play:"
+      input = gets.chomp.to_i
+    end
+    insert_tile(self.current_player, input)
+  end
+
+  def swap_player
+    (@current_player == @@PLAYERS[0])? @current_player = @@PLAYERS[1]: @current_player = @@PLAYERS[0]
+  end
+
+  def display_board
+    current_board(@board_slots)
   end
 
   private
-    def swap_player
-      (@current_player == @@PLAYERS[0])? @current_player = @@PLAYERS[1]: @current_player = @@PLAYERS[0]
+    def insert_tile(player, i)
+      @board_slots[i - 1] = "X" if player == @@PLAYERS[0]
+      @board_slots[i - 1] = "O" if player == @@PLAYERS[1]
     end
 end
 
 puts "Welcome! Grab a friend and get ready for some Tic Tac Toe!"
-new_game = NewGame.new()
-new_game.prompt_current_player
+game = NewGame.new()
+
+while (game.game_continues) do
+  game.display_board
+  game.get_player_position
+  game.display_board
+
+  game.game_continues = false
+end
